@@ -23,8 +23,7 @@ def su2_parameters(U):
         print("Error, matrix dimensions of su2_parameters must be 2x2.")
         return
     if not np.isclose(np.linalg.det(U), 1):
-        print("Error, matrix must have determinant 1 to be decomposed into \
-                SU(2) parameters.")
+        print("Error, matrix must have determinant 1 to be decomposed into SU(2) parameters.")
         return
 
     # Sometimes the absolute value of the matrix entry is very, very close to
@@ -64,8 +63,7 @@ def su3_parameters(U):
         print("Error, matrix dimensions of su3_parameters must be 3x3.")        
         return
     if not np.isclose(np.linalg.det(U), 1):                                     
-        print("Error, matrix must have determinant 1 to be decomposed into\
-               SU(2) parameters.")
+        print("Error, matrix must have determinant 1 to be decomposed into SU(2) parameters.")
         return
 
     # Grab the entries of the first row
@@ -82,6 +80,7 @@ def su3_parameters(U):
     elif np.isclose(np.abs(x), 1):
         # Compute the required phase matrix and embed into SU(3)
         phase_su2 = np.array([[np.conj(x), 0], [0, x]])
+
         full_phase_su2 = np.asmatrix(np.identity(3)) + 0j
         full_phase_su2[0:2, 0:2] = phase_su2
 
@@ -130,22 +129,50 @@ def build_staircase(U):
     transformations = []
     running_product = U
 
-    # In the special case where the top-most entry is a 1, or within some
-    # small tolerance of it, we basically already have an SU(n-1) transformation
-    # in there so just fill with empty parameters (we ditch the empties later)
-    if np.isclose(U[0, 0], 1):
-        transformations = [[0., 0., 0.]] * (n - 1)
-    # Another special case is when the top left entry has modulus 1 (or close
-    # to it). Now we need to add a separate phase shift as well. 
-    elif np.isclose(np.abs(U[0, 0]), 1):
-        # "Phase shift" by applying an SU(2) transformation to cancel out the
-        # top-most phase. Do nothing to everything else.
-        phase_su2 = np.array([[np.conj(U[0, 0]), 0], [0, U[0, 0]]])
-        transformations = [[0., 0., 0.]] * (n - 2) + [su2_parameters(np.asmatrix(phase_su2).getH())]
+    # There are a number of special cases to consider which occur when the
+    # left-most column contains all 0s except for one entry.
+    moduli = [np.abs(U[x, 0]) for x in range(n)]
+    if np.all(np.isclose(sorted(moduli), [0.] * (n - 1) + [1])): 
+        # In the special case where the top-most entry is a 1, or within some
+        # small tolerance of it, we basically already have an SU(n-1) transformation
+        # in there so just fill with empty parameters 
+        if np.isclose(running_product[0, 0], 1):
+            transformations = [[0., 0., 0.]] * (n - 1)
+        # Another special case is when the top left entry has modulus 1 (or close
+        # to it). Now we need to add a separate phase shift as well. 
+        elif np.isclose(np.abs(running_product[0, 0]), 1):
+            # "Phase shift" by applying an SU(2) transformation to cancel out the
+            # top-most phase. Do nothing to everything else.
+            phase_su2 = np.array([[np.conj(running_product[0, 0]), 0], [0, running_product[0, 0]]])
+            transformations = [[0., 0., 0.]] * (n - 2) + [su2_parameters(np.asmatrix(phase_su2).getH())]
 
-        full_phase_su2 = np.asmatrix(np.identity(n)) + 0j
-        full_phase_su2[0:2, 0:2] = phase_su2
-        running_product = np.dot(full_phase_su2, running_product)
+            full_phase_su2 = np.asmatrix(np.identity(n)) + 0j
+            full_phase_su2[0:2, 0:2] = phase_su2
+            running_product = np.dot(full_phase_su2, running_product)
+        else:
+            # If the non-zero entry is lower down, permute until it
+            # reaches the top and then apply a phase transformation.
+            for rot_idx in range(n - 1, 0, -1):
+                if running_product[rot_idx, 0] != 0:
+                    permmat = np.array([[0, -1], [1, 0]])
+                
+                    full_permmat = np.asmatrix(np.identity(n)) + 0j
+                    full_permmat[rot_idx-1:rot_idx+1, rot_idx-1:rot_idx+1] = permmat
+                    temp_product = np.dot(full_permmat, running_product)
+
+                    if rot_idx == 1: # If we're at the top, add the phase too
+                        phase_su2 = np.array([[np.conj(temp_product[0, 0]), 0], [0, temp_product[0, 0]]])
+                        permmat = np.dot(phase_su2, permmat)
+
+                    transformations.append(su2_parameters(np.asmatrix(permmat).getH()))
+
+                    full_trans = np.asmatrix(np.identity(n)) + 0j
+                    full_trans[rot_idx-1:rot_idx+1, rot_idx-1:rot_idx+1] = permmat 
+                        
+                    running_product = np.dot(full_trans, running_product)
+
+                else: # Otherwise do nothing between these modes
+                    transformations.append([0, 0, 0])
     else:
         for rot_idx in range(n - 1):
             # Start at the bottom
