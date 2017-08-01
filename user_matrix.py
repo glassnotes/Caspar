@@ -16,19 +16,7 @@ import numpy as np
 
 # Modify me to whatever matrix you like!
 # Currently n = 11 is about the largest Caspar can safely handle.
-"""
-SUn_mat = np.array([[1., 0., 0., 0., 0], 
-                    [0, np.exp(-2 * 1j * np.pi / 3), 0., 0., 0.],
-                    [0, 0., 1., 0., 0.],
-                    [0, 0., 0., 1., 0.],
-                    [0, 0., 0, 0., np.exp(2 * 1j * np.pi / 3)]])
-"""
 
 SUn_mat = np.array([[0, 0, 1.],
                     [np.exp(2 * 1j * np.pi / 3), 0., 0],
                     [0, np.exp(-2 * 1j * np.pi / 3), 0.]])
-"""
-SUn_mat = np.array([[np.exp(-2 * 1j * np.pi / 3), 0, 0, 0],
-                    [0, 1, 0, 0],
-                    [0, 0, np.exp(1j * np.pi / 3), 0],
-                    [0, 0, 0, np.exp(1j * np.pi / 3)]])"""
