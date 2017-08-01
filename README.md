@@ -3,7 +3,8 @@ A Python implementation of the SU(_n_) factorization scheme of [citation forthco
                                                                                    
 ## Dependencies                                                                    
                                                                                    
-Caspar is written in Python 3. You will also need the numpy package.
+You will need the numpy package. Caspar was developed using Python 3.5.2 but
+also was tested and runs smoothly in 2.7.10. 
 
 ## Installation
 

@@ -67,7 +67,7 @@ def su3_parameters(U):
     # already have an SU(2) transformation embedded in an SU(3) transform,
     # so all we need to do is get the parameters of that SU(2) transform.
     if np.isclose(x, 1):
-        return [[0, 0, 0], [0, 0, 0], su2_parameters(U[1:,1:])]
+        return [[0., 0., 0.], [0., 0., 0.], su2_parameters(U[1:,1:])]
     # Another special case: the modulus of the top left element is 1. 
     # Then we need to do a transformation on modes 1 and 2 to make the top 
     # entry 1, then an SU(2) transformation on modes 2 and 3 with what's left.
@@ -81,7 +81,7 @@ def su3_parameters(U):
         running_product = np.dot(full_phase_su2, U) 
         remainder_su2 = running_product[1:, 1:]
 
-        return [[0, 0, 0], su2_parameters(np.asmatrix(phase_su2).getH()), su2_parameters(remainder_su2)]
+        return [[0., 0., 0.], su2_parameters(np.asmatrix(phase_su2).getH()), su2_parameters(remainder_su2)]
 
     # Typical case
     cf = np.sqrt(1 - pow(np.absolute(x), 2))
@@ -126,14 +126,14 @@ def build_staircase(U):
     # small tolerance of it, we basically already have an SU(n-1) transformation
     # in there so just fill with empty parameters (we ditch the empties later)
     if np.isclose(U[0, 0], 1):
-        transformations = [[0, 0, 0]] * (n - 1)
+        transformations = [[0., 0., 0.]] * (n - 1)
     # Another special case is when the top left entry has modulus 1 (or close
     # to it). Now we need to add a separate phase shift as well. 
     elif np.isclose(np.abs(U[0, 0]), 1):
         # "Phase shift" by applying an SU(2) transformation to cancel out the
         # top-most phase. Do nothing to everything else.
         phase_su2 = np.array([[np.conj(U[0, 0]), 0], [0, U[0, 0]]])
-        transformations = [[0, 0, 0]] * (n - 2) + [su2_parameters(np.asmatrix(phase_su2).getH())]
+        transformations = [[0., 0., 0.]] * (n - 2) + [su2_parameters(np.asmatrix(phase_su2).getH())]
 
         full_phase_su2 = np.asmatrix(np.identity(n)) + 0j
         full_phase_su2[0:2, 0:2] = phase_su2
@@ -233,8 +233,5 @@ def sun_factorization(U):
         for md1 in range(n - 1, md2 - 2, -1):                               
             parameters.append((str(md1) + "," + str(md1+1), parameters_no_modes[param_idx]))
             param_idx += 1  
-
-    # Now remove any transformations that have all parameters zero
-    parameters = [x for x in parameters if x[1] != [0, 0, 0]]
 
     return parameters
