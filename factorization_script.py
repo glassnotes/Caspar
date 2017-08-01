@@ -13,8 +13,7 @@
 import sys
 import numpy as np
 
-from sun_factorization import sun_factorization
-from sun_reconstruction import sun_reconstruction
+from caspar import * 
 
 # Read in input from file
 from user_matrix import SUn_mat
