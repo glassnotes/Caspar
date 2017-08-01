@@ -1,5 +1,8 @@
 # Caspar 
 A Python implementation of the SU(_n_) factorization scheme of [citation forthcoming].
+
+If you run into any trouble, or find a bug, feel free to drop me a line at
+odimatte@uwaterloo.ca or create an issue in the repo.
                                                                                    
 ## Dependencies                                                                    
                                                                                    
