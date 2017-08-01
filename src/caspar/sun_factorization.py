@@ -27,7 +27,15 @@ def su2_parameters(U):
                 SU(2) parameters.")
         return
 
-    b = 2 * np.arcsin(np.absolute(U[0, 1]))
+    # Sometimes the absolute value of the matrix entry is very, very close to
+    # 1 and slightly above, when it should be 1 exactly. Isolate these cases
+    # to prevent us from getting NaN.
+    b = None
+    if np.isclose(np.absolute(U[0, 1]), 1):
+        b = 2 * np.arcsin(1)
+    else:
+        b = 2 * np.arcsin(np.absolute(U[0, 1]))
+
     arg_pos = np.angle(U[0, 0]) #(a + g)/2
     arg_neg = -np.angle(U[1, 0]) #(a - g)/2
     a, g = arg_pos + arg_neg, arg_pos - arg_neg
