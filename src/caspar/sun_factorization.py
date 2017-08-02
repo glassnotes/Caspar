@@ -132,7 +132,7 @@ def build_staircase(U):
     # There are a number of special cases to consider which occur when the
     # left-most column contains all 0s except for one entry.
     moduli = [np.abs(U[x, 0]) for x in range(n)]
-    if np.all(np.isclose(sorted(moduli), [0.] * (n - 1) + [1])): 
+    if np.allclose(sorted(moduli), [0.] * (n - 1) + [1]): 
         # In the special case where the top-most entry is a 1, or within some
         # small tolerance of it, we basically already have an SU(n-1) transformation
         # in there so just fill with empty parameters 
@@ -253,7 +253,7 @@ def sun_factorization(U):
         print("Error, matrix must have determinant 1.")
         return None
 
-    if not np.all(np.isclose(np.dot(U, np.asmatrix(U).getH()), np.eye(n))):
+    if not np.allclose(np.dot(U, np.asmatrix(U).getH()), np.eye(n)):
         print("Error, matrix must be unitary with determinant 1.")
         return None
 
