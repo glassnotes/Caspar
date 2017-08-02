@@ -79,16 +79,16 @@ def su3_parameters(U):
     # entry 1, then an SU(2) transformation on modes 2 and 3 with what's left.
     elif np.isclose(np.abs(x), 1):
         # Compute the required phase matrix and embed into SU(3)
-        phase_su2 = np.array([[np.conj(x), 0], [0, x]])
+        phase_su2 = np.matrix([[np.conj(x), 0], [0, x]])
 
         full_phase_su2 = np.asmatrix(np.identity(3)) + 0j
         full_phase_su2[0:2, 0:2] = phase_su2
 
         # Compute what's left of the product, and the parameters
-        running_product = np.dot(full_phase_su2, U) 
+        running_product = full_phase_su2 * U
         remainder_su2 = running_product[1:, 1:]
 
-        return [[0., 0., 0.], su2_parameters(np.asmatrix(phase_su2).getH()), su2_parameters(remainder_su2)]
+        return [[0., 0., 0.], su2_parameters(phase_su2.getH()), su2_parameters(remainder_su2)]
 
     # Typical case
     cf = np.sqrt(1 - pow(np.absolute(x), 2))
@@ -108,7 +108,7 @@ def su3_parameters(U):
     middle_params = su2_parameters(middle[0:2, 0:2])
 
     # SU_23(3) - again three parameters
-    right = np.dot(np.dot(middle.getH(), left.getH()), U)
+    right = middle.getH() * left.getH() * U
     right_params = su2_parameters(right[1:, 1:]) 
 
     return [left_params, middle_params, right_params]
@@ -127,7 +127,7 @@ def build_staircase(U):
 
     # We need to do n - 1 transformations, starting from the bottom up.
     transformations = []
-    running_product = U
+    running_prod = U
 
     # There are a number of special cases to consider which occur when the
     # left-most column contains all 0s except for one entry.
@@ -136,40 +136,40 @@ def build_staircase(U):
         # In the special case where the top-most entry is a 1, or within some
         # small tolerance of it, we basically already have an SU(n-1) transformation
         # in there so just fill with empty parameters 
-        if np.isclose(running_product[0, 0], 1):
+        if np.isclose(running_prod[0, 0], 1):
             transformations = [[0., 0., 0.]] * (n - 1)
         # Another special case is when the top left entry has modulus 1 (or close
         # to it). Now we need to add a separate phase shift as well. 
-        elif np.isclose(np.abs(running_product[0, 0]), 1):
+        elif np.isclose(np.abs(running_prod[0, 0]), 1):
             # "Phase shift" by applying an SU(2) transformation to cancel out the
             # top-most phase. Do nothing to everything else.
-            phase_su2 = np.array([[np.conj(running_product[0, 0]), 0], [0, running_product[0, 0]]])
-            transformations = [[0., 0., 0.]] * (n - 2) + [su2_parameters(np.asmatrix(phase_su2).getH())]
+            phase_su2 = np.matrix([[np.conj(running_prod[0, 0]), 0], [0, running_prod[0, 0]]])
+            transformations = [[0., 0., 0.]] * (n - 2) + [su2_parameters(phase_su2.getH())]
 
             full_phase_su2 = np.asmatrix(np.identity(n)) + 0j
             full_phase_su2[0:2, 0:2] = phase_su2
-            running_product = np.dot(full_phase_su2, running_product)
+            running_prod = full_phase_su2 * running_prod
         else:
             # If the non-zero entry is lower down, permute until it
             # reaches the top and then apply a phase transformation.
             for rot_idx in range(n - 1, 0, -1):
-                if running_product[rot_idx, 0] != 0:
-                    permmat = np.array([[0, -1], [1, 0]])
+                if running_prod[rot_idx, 0] != 0:
+                    permmat = np.matrix([[0, -1], [1, 0]])
                 
                     full_permmat = np.asmatrix(np.identity(n)) + 0j
                     full_permmat[rot_idx-1:rot_idx+1, rot_idx-1:rot_idx+1] = permmat
-                    temp_product = np.dot(full_permmat, running_product)
+                    temp_product = full_permmat * running_prod
 
                     if rot_idx == 1: # If we're at the top, add the phase too
-                        phase_su2 = np.array([[np.conj(temp_product[0, 0]), 0], [0, temp_product[0, 0]]])
-                        permmat = np.dot(phase_su2, permmat)
+                        phase_su2 = np.matrix([[np.conj(temp_product[0, 0]), 0], [0, temp_product[0, 0]]])
+                        permmat = phase_su2 * permmat
 
-                    transformations.append(su2_parameters(np.asmatrix(permmat).getH()))
+                    transformations.append(su2_parameters(permmat.getH()))
 
                     full_trans = np.asmatrix(np.identity(n)) + 0j
                     full_trans[rot_idx-1:rot_idx+1, rot_idx-1:rot_idx+1] = permmat 
                         
-                    running_product = np.dot(full_trans, running_product)
+                    running_prod = full_trans * running_prod
 
                 else: # Otherwise do nothing between these modes
                     transformations.append([0, 0, 0])
@@ -188,10 +188,10 @@ def build_staircase(U):
                 # absolute values of all columns *up* to this point.
                 sum_of_column = 0
                 for k in range(i):
-                    sum_of_column += pow(np.absolute(running_product[k,0]), 2)
+                    sum_of_column += pow(np.absolute(running_prod[k,0]), 2)
                 cf = np.sqrt(1 - sum_of_column)
 
-                y, z = running_product[i, 0], running_product[j, 0] 
+                y, z = running_prod[i, 0], running_prod[j, 0] 
                 capY, capZ  = y / cf, z / cf 
 
                 # Build the SU(2) transformation and embed it into the larger matrix
@@ -211,9 +211,9 @@ def build_staircase(U):
 
             # Embed into larger space
             full_Rij_inv[i:j+1, i:j+1] = Rij_inv
-            running_product = np.dot(full_Rij_inv, running_product)
+            running_prod = full_Rij_inv * running_prod
 
-    return transformations, running_product
+    return transformations, running_prod
 
 
 def sun_parameters(U):
@@ -242,18 +242,23 @@ def sun_factorization(U):
     """ Decompose an arbitrary element in SU(n) as a sequence of 
         SU(2) transformations as per our method [citation forthcoming].
 
-        First we compute the parameters, and then we will attach the mode
-        indices to them. Returns a list of tuples of the form (modes, params).
+        Takes as input a numpy matrix U.
+        Returns a list of operations in the form "i,i+1", [a, b, g] where
+        the i indicate the modes of an SU(2) transformation and [a, b, g]
+        are its parameters.
     """
     # Check that the matrix has the proper form, i.e. it is unitary and
     # it has determinant 1.
     n = U.shape[0]
 
+    if n < 3:
+        print("Error, matrix for decomposition must be at least 3x3.")
+
     if not np.isclose(np.linalg.det(U), 1):                           
         print("Error, matrix must have determinant 1.")
         return None
 
-    if not np.allclose(np.dot(U, np.asmatrix(U).getH()), np.eye(n)):
+    if not np.allclose(U * U.getH(), np.eye(n)):
         print("Error, matrix must be unitary with determinant 1.")
         return None
 

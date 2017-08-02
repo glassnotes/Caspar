@@ -66,6 +66,6 @@ def sun_reconstruction(n, parameters):
 
         # Compute the next transformation and multiply
         next_trans = embed_su2(n, md1, md2, param[1])
-        U = np.dot(U, next_trans)
+        U = U * next_trans
 
     return U
