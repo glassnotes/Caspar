@@ -15,8 +15,10 @@
 import numpy as np
 
 # Modify me to whatever matrix you like!
-# Currently n = 11 is about the largest Caspar can safely handle.
+# Currently n = 10 is about the largest Caspar can safely handle for very dense
+# matrices, but it has been tested on up to 6-qubit Paulis (more sparse)
+# successfully.
 
-SUn_mat = np.array([[0, 0, 1.],
+SUn_mat = np.matrix([[0, 0, 1.],
                     [np.exp(2 * 1j * np.pi / 3), 0., 0],
                     [0, np.exp(-2 * 1j * np.pi / 3), 0.]])
