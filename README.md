@@ -36,9 +36,11 @@ into the indicated modes of an SU(_n_) transformation, and multiplying them
 together from top to bottom of the list (with each transformation added to 
 the product on the right, e.g. _U_ = _U_<sub>45</sub> _U_<sub>34</sub>...).  
 
-Important note: at the current time, Caspar works well for up to about _n_ = 11. 
-After this point, it begins to experience numerical issues due to very small
-numbers. 
+_Important note_: at the current time, Caspar works well for up to about _n_ = 10,
+if the matrix is a Haar-random, dense special unitary. After this point, it 
+begins to suffer from issues due to precision. However, for sparser matrices,
+e.g. the m-qubit Paulis, it has seen success for up to 6 qubits (n = 2^6 = 64,
+and this is just as high as I tested).
 
 
 ## Usage (detailed)
@@ -54,7 +56,7 @@ written in matrix form as  [[_e_<sup>_i_(_a_+_g_)/2</sup> cos(_b_/2),
 There are two main functions: `sun_factorization` and `sun_reconstruction`, 
 each contained in the appropriately named files.
                                                                                    
-The function `sun_factorization` takes an SU(_n_) matrix (as a numpy array) 
+The function `sun_factorization` takes an SU(_n_) matrix (as a numpy matrix) 
 and decomposes it into a sequence of _n_(_n_-1)/2 such SU(2) transformations. 
 The full set of _n_<sup>2</sup> - 1 parameters is returned as a list of tuples 
 of the form ("_i_,_i_+1", [_a_<sub>_k_</sub>, _b_<sub>_k_</sub>, _g_<sub>_k_</sub>]) 
@@ -69,7 +71,7 @@ from caspar import sun_factorization
 
 n = 3
 
-SUn_mat = np.array([[0., 0., 1.],                                               
+SUn_mat = np.matrix([[0., 0., 1.],                                               
                     [np.exp(2 * 1j * np.pi/ 3), 0., 0.],                        
                     [0., np.exp(-2 * 1j * np.pi / 3), 0.]])    
 
