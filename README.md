@@ -35,8 +35,9 @@ The original matrix `SUn_mat` is obtained by embedding each SU(2) transformation
 into the indicated modes of an SU(_n_) transformation, and multiplying them 
 together from top to bottom of the list (with each transformation added to 
 the product on the right, e.g. _U_ = _U_<sub>45</sub> _U_<sub>34</sub>...).  
+## Important note
 
-_Important note_: at the current time, Caspar works well for up to about _n_ = 10,
+At the current time, Caspar works well for up to about _n_ = 10,
 if the matrix is a Haar-random, dense special unitary. After this point, it 
 begins to suffer from issues due to precision. However, for sparser matrices,
 e.g. the m-qubit Paulis, it has seen success for up to 6 qubits (n = 2^6 = 64,
