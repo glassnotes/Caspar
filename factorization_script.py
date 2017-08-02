@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-                                                            
 #                                                                                  
 # factorization_script.py: Factorize the matrix that has been inputted in the
-#                          file matrixfile.py. 
+#                          file user_matrix.py. 
 #                                                                                  
 # © 2017 Olivia Di Matteo (odimatte@uwaterloo.ca)                                  
 #                                                                                  
@@ -18,7 +18,7 @@ from caspar import *
 # Read in input from file
 from user_matrix import SUn_mat
 
-np.set_printoptions(precision = 4)
+np.set_printoptions(precision = 6)
 
 # Get the dimension of the matrix.
 n = SUn_mat.shape[0]
