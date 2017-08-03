@@ -3,7 +3,7 @@
 #                                                                                  
 # sun_factorization.py: Functions to perform factorization of SU(n)
 #                       transformations into SU(2) transformations using
-#                       the method of [citation forthcoming].
+#                       the method of arXiv:1708.00735.
 #                                                                                  
 # © 2017 Olivia Di Matteo (odimatte@uwaterloo.ca)                                  
 #                                                                                  
@@ -240,7 +240,7 @@ def sun_parameters(U):
 
 def sun_factorization(U):
     """ Decompose an arbitrary element in SU(n) as a sequence of 
-        SU(2) transformations as per our method [citation forthcoming].
+        SU(2) transformations as per our method arXiv:1708.00735. 
 
         Takes as input a numpy matrix U.
         Returns a list of operations in the form "i,i+1", [a, b, g] where

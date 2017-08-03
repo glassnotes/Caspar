@@ -1,5 +1,5 @@
 # Caspar 
-A Python implementation of the SU(_n_) factorization scheme of [citation forthcoming].
+A Python implementation of the SU(_n_) factorization scheme of <a href="http://arxiv.org/abs/1708.00735" target="_blank">arXiv:1708.00735</a>.
 
 If you run into any trouble, or find a bug, feel free to drop me a line at
 odimatte@uwaterloo.ca or create an issue in the repo.
