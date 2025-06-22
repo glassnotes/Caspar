@@ -104,3 +104,15 @@ parameters = [("1,2", [1.23, 2.34, 0.999]),
 
 new_SUn_mat = sun_reconstruction(6, parameters)
 ```
+
+## Citing
+
+If you make user of Caspar in your work, you can cite it using the BibTeX below.
+
+```
+@misc{caspar,
+  author       = {{Di Matteo}, Olivia},
+  title        = {Caspar: Simple factorization of unitary transformations},
+  year         = 2017,
+  url          = {https://github.com/glassnotes/Caspar/}
+}
